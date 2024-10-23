@@ -138,6 +138,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.MainGroupBox);
             this.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MinimumSize = new System.Drawing.Size(560, 165);
             this.Name = "HomeServerControl";
             this.Size = new System.Drawing.Size(1000, 200);
             this.MainGroupBox.ResumeLayout(false);

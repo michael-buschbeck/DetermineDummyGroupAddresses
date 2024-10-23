@@ -47,25 +47,14 @@ namespace DetermineDummyGroupAddresses
             DependentDevicesPanel.SuspendLayout();
             DependentDevicesPanel.Controls.Clear();
 
-            int dependentDeviceLocationY = 0;
-
-            foreach (var dependentDevice in Project.DependentDevices)
+            foreach (var dependentDevice in Project.DependentDevices.Reverse<DependentDevice>())
             {
                 var dependentDeviceControl = dependentDevice.CreateControl(Project);
 
-                if (dependentDeviceLocationY > 0)
-                {
-                    dependentDeviceLocationY += dependentDeviceControl.Margin.Top;
-                }
+                dependentDeviceControl.Dock = DockStyle.Top;
 
-                dependentDeviceControl.Location = new(0, dependentDeviceLocationY);
-                dependentDeviceControl.Size = new(DependentDevicesPanel.Width, dependentDeviceControl.Size.Height);
-                dependentDeviceControl.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
-
+                DependentDevicesPanel.Controls.Add(new Splitter() { Dock = DockStyle.Top });
                 DependentDevicesPanel.Controls.Add(dependentDeviceControl);
-
-                dependentDeviceLocationY += dependentDeviceControl.Size.Height;
-                dependentDeviceLocationY += dependentDeviceControl.Margin.Bottom;
             }
 
             foreach (var dependentDeviceControl in DependentDevicesPanel.Controls.OfType<IDependentDeviceControl>())
