@@ -1,4 +1,6 @@
 /.vs
 /packages
+/*.exe
+/*.msi
 /*/bin/
 /*/obj/
