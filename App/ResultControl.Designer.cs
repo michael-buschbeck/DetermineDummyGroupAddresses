@@ -31,7 +31,7 @@
             System.Windows.Forms.ColumnHeader GroupAddressHeader;
             System.Windows.Forms.ColumnHeader NameHeader;
             System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Fehlende Dummy-Gruppenadressen", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Überflüssige Dummy-Gruppenadressen", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Nicht benötigte Dummy-Gruppenadressen", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Korrekt zugeordnete Dummy-Gruppenadressen", System.Windows.Forms.HorizontalAlignment.Left);
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem(new string[] {
             "0/0/12",
@@ -66,7 +66,7 @@
             NameHeader});
             listViewGroup1.Header = "Fehlende Dummy-Gruppenadressen";
             listViewGroup1.Name = "ToAdd";
-            listViewGroup2.Header = "Überflüssige Dummy-Gruppenadressen";
+            listViewGroup2.Header = "Nicht benötigte Dummy-Gruppenadressen";
             listViewGroup2.Name = "ToRemove";
             listViewGroup3.Header = "Korrekt zugeordnete Dummy-Gruppenadressen";
             listViewGroup3.Name = "ToKeep";
