@@ -2,7 +2,6 @@
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Xml;
-using System.CodeDom;
 
 namespace DetermineDummyGroupAddresses
 {
@@ -46,6 +45,11 @@ namespace DetermineDummyGroupAddresses
 
         private static ushort ParseAddress(string address)
         {
+            if (string.IsNullOrEmpty(address))
+            {
+                return 0;
+            }
+
             int firstSlashOffset = address.IndexOf('/');
 
             if (firstSlashOffset < 0)

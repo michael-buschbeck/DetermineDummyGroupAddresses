@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Xml.Linq;
 
 namespace DetermineDummyGroupAddresses
 {
@@ -24,6 +23,14 @@ namespace DetermineDummyGroupAddresses
         /// Chain of group address declarations in case there is more than one for the same group address.
         /// </summary>
         public GroupAddressInfo Next { get; set; }
+
+        public IEnumerable<GroupAddressInfo> All()
+        {
+            for (var groupAddressInfo = this;  groupAddressInfo != null; groupAddressInfo = groupAddressInfo.Next)
+            {
+                yield return groupAddressInfo;
+            }
+        }
 
         public bool IsUsedInSegmentsOtherThan(PhysicalAddress segmentAddress)
         {

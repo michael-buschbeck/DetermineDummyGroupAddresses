@@ -7,6 +7,12 @@ namespace DetermineDummyGroupAddresses
 {
     public partial class ResultControl : UserControl
     {
+        private readonly ListViewGroup ResultListView_IncompatibleType_ListViewGroup;
+        private readonly ListViewGroup ResultListView_InconsistentType_ListViewGroup;
+        private readonly ListViewGroup ResultListView_InconsistentName_ListViewGroup;
+
+        private readonly ListViewGroup ResultListView_NotDefined_ListViewGroup;
+
         private readonly ListViewGroup ResultListView_ToAdd_ListViewGroup;
         private readonly ListViewGroup ResultListView_ToRemove_ListViewGroup;
         private readonly ListViewGroup ResultListView_ToKeep_ListViewGroup;
@@ -14,6 +20,12 @@ namespace DetermineDummyGroupAddresses
         public ResultControl()
         {
             InitializeComponent();
+
+            ResultListView_IncompatibleType_ListViewGroup = ResultListView.Groups["IncompatibleType"];
+            ResultListView_InconsistentType_ListViewGroup = ResultListView.Groups["InconsistentType"];
+            ResultListView_InconsistentName_ListViewGroup = ResultListView.Groups["InconsistentName"];
+
+            ResultListView_NotDefined_ListViewGroup = ResultListView.Groups["NotDefined"];
 
             ResultListView_ToAdd_ListViewGroup = ResultListView.Groups["ToAdd"];
             ResultListView_ToRemove_ListViewGroup = ResultListView.Groups["ToRemove"];
@@ -27,26 +39,80 @@ namespace DetermineDummyGroupAddresses
 
         public void RefreshContents(Project project, DependentDevice dependentDevice)
         {
+            const string arrow = "\u27A4";
+
             if (project == null || dependentDevice == null)
             {
                 ClearContents();
                 return;
             }
 
-            var expectedGroupAddressInfos = new Dictionary<GroupAddress, GroupAddressInfo>();
-
-            foreach (GroupAddress dependentGroupAddress in dependentDevice.DependentGroupAddressInfos.Keys)
-            {
-                if (project.GroupAddressInfos.TryGetValue(dependentGroupAddress, out var dependentGroupAddressInfo) && dependentGroupAddressInfo.IsUsedInSegmentsOtherThan(dependentDevice.SegmentAddress))
-                {
-                    expectedGroupAddressInfos.Add(
-                        dependentGroupAddress,
-                        dependentGroupAddressInfo);
-                }
-            }
-
             ResultListView.SuspendLayout();
             ResultListView.Items.Clear();
+
+            var expectedGroupAddressInfos = new Dictionary<GroupAddress, GroupAddressInfo>();
+
+            foreach (var dependentGroupAddress in dependentDevice.DependentGroupAddressInfos.Keys.OrderBy(groupAddress => groupAddress))
+            {
+                if (project.GroupAddressInfos.TryGetValue(dependentGroupAddress, out var projectGroupAddressInfo))
+                {
+                    if (projectGroupAddressInfo.IsUsedInSegmentsOtherThan(dependentDevice.SegmentAddress))
+                    {
+                        expectedGroupAddressInfos.Add(
+                            dependentGroupAddress,
+                            projectGroupAddressInfo);
+                    }
+
+                    foreach (var dependentGroupAddressInfo in dependentDevice.DependentGroupAddressInfos[dependentGroupAddress].All())
+                    {
+                        if (projectGroupAddressInfo.DatapointName != dependentGroupAddressInfo.DatapointName && dependentGroupAddressInfo.IsPrimary)
+                        {
+                            var resultListViewItem = new ListViewItem()
+                            {
+                                Text = dependentGroupAddress.ToString(),
+                                SubItems = { dependentGroupAddressInfo.DatapointName + $" {arrow} " + projectGroupAddressInfo.DatapointName },
+
+                                Group = ResultListView_InconsistentName_ListViewGroup,
+                            };
+
+                            ResultListView.Items.Add(resultListViewItem);
+                        }
+
+                        if (projectGroupAddressInfo.DatapointType != dependentGroupAddressInfo.DatapointType)
+                        {
+                            var resultListViewItem = new ListViewItem()
+                            {
+                                Text = dependentGroupAddress.ToString(),
+                                SubItems = { dependentGroupAddressInfo.DatapointName + $" ({dependentGroupAddressInfo.DatapointType} {arrow} {projectGroupAddressInfo.DatapointType})" },
+
+                                Group = projectGroupAddressInfo.DatapointType.IsCompatibleTo(dependentGroupAddressInfo.DatapointType)
+                                    ? ResultListView_InconsistentType_ListViewGroup
+                                    : ResultListView_IncompatibleType_ListViewGroup,
+                            };
+
+                            if (dependentGroupAddressInfo.IsPrimary || resultListViewItem.Group == ResultListView_IncompatibleType_ListViewGroup)
+                            {
+                                ResultListView.Items.Add(resultListViewItem);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var dependentGroupAddressInfo in dependentDevice.DependentGroupAddressInfos[dependentGroupAddress].All())
+                    {
+                        var resultListViewItem = new ListViewItem()
+                        {
+                            Text = dependentGroupAddress.ToString(),
+                            SubItems = { dependentGroupAddressInfo.DatapointName },
+                            
+                            Group = ResultListView_NotDefined_ListViewGroup,
+                        };
+
+                        ResultListView.Items.Add(resultListViewItem);
+                    }
+                }
+            }
 
             foreach (var expectedGroupAddressInfo in expectedGroupAddressInfos.Values.OrderBy(groupAddressInfo => groupAddressInfo.GroupAddress))
             {
