@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows.Forms;
@@ -23,20 +22,37 @@ namespace DetermineDummyGroupAddresses
 
         public void ParseConfig(string json)
         {
-            var importGroupAddresses = new HashSet<GroupAddress>();
+            var importGroupAddressInfos = new GroupAddressInfoDictionary();
 
             var config = JsonSerializer.Deserialize<Config>(json);
 
             foreach (var registerItemConfig in config.RegisterItems)
             {
+                var isPrimary = true;
+
                 foreach (var groupAddressConfig in registerItemConfig.Properties.GroupAddresses)
                 {
                     var groupAddress = new GroupAddress(groupAddressConfig.Address);
-                    importGroupAddresses.Add(groupAddress);
+
+                    var datapointType = new DatapointType(
+                        (ushort)(groupAddressConfig.DatapointType / 10000 % 10000),
+                        (ushort)(groupAddressConfig.DatapointType % 10000));
+
+                    var groupAddressInfo = new GroupAddressInfo()
+                    {
+                        GroupAddress = groupAddress,
+                        DatapointType = datapointType,
+                        DatapointName = groupAddressConfig.Title,
+                        IsPrimary = isPrimary,
+                    };
+
+                    importGroupAddressInfos.Add(groupAddressInfo);
+
+                    isPrimary = false;
                 }
             }
 
-            DependentGroupAddresses = importGroupAddresses;
+            DependentGroupAddressInfos = importGroupAddressInfos;
             DependentGroupAddressesChanged = DateTime.Now;
         }
 
@@ -71,7 +87,7 @@ namespace DetermineDummyGroupAddresses
                         public string Description { get; set; }
 
                         [JsonPropertyName("dpt")]
-                        public int DatapointType { get; set; }
+                        public uint DatapointType { get; set; }
                     }
                 }
             }

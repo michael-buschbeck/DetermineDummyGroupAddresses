@@ -27,7 +27,7 @@ namespace DetermineDummyGroupAddresses
 
         public void ParseProject()
         {
-            var importGroupAddresses = new HashSet<GroupAddress>();
+            var importGroupAddressInfos = new GroupAddressInfoDictionary();
 
             using (var projectFileStream = new FileStream(ProjectFile, FileMode.Open, FileAccess.Read))
             using (var projectFileArchive = new ZipArchive(projectFileStream, ZipArchiveMode.Read))
@@ -44,24 +44,47 @@ namespace DetermineDummyGroupAddresses
                         {
                             var datapointConfig = (DatapointConfig)datapointSerializer.Deserialize(projectFileEntryStream);
 
+                            var datapointType = new DatapointType(datapointConfig.DatapointType);
+                            var datapointName = datapointConfig.Name;
+
+                            var isPrimary = true;
+
                             void AddGroupAddress(string groupAddressString)
                             {
-                                if (!string.IsNullOrEmpty(groupAddressString))
+                                if (string.IsNullOrEmpty(groupAddressString))
                                 {
-                                    var groupAddressValue = ushort.Parse(groupAddressString);
-                                    importGroupAddresses.Add(new GroupAddress(groupAddressValue));
+                                    return;
                                 }
+
+                                var groupAddress = new GroupAddress(ushort.Parse(groupAddressString));
+
+                                if (groupAddress.Value == 0)
+                                {
+                                    return;
+                                }
+
+                                var groupAddressInfo = new GroupAddressInfo()
+                                {
+                                    GroupAddress = groupAddress,
+                                    DatapointType = datapointType,
+                                    DatapointName = datapointName,
+                                    IsPrimary = isPrimary,
+                                };
+
+                                importGroupAddressInfos.Add(groupAddressInfo);
+
+                                isPrimary = false;
                             }
 
-                            AddGroupAddress(datapointConfig.ReadGroupAddress);
                             AddGroupAddress(datapointConfig.WriteGroupAddress);
+                            AddGroupAddress(datapointConfig.ReadGroupAddress);
                             AddGroupAddress(datapointConfig.DisplayGroupAddress);
                         }
                     }
                 }
             }
 
-            DependentGroupAddresses = importGroupAddresses;
+            DependentGroupAddressInfos = importGroupAddressInfos;
             DependentGroupAddressesChanged = DateTime.Now;
         }
 

@@ -12,8 +12,16 @@ namespace DetermineDummyGroupAddresses
         public PhysicalAddress SegmentAddress { get; set; }
         public PhysicalAddress PhysicalAddress { get; set; }
 
+        /// <summary>
+        /// Group addresses assigned to the dummy device in the ETS project.
+        /// </summary>
         public HashSet<GroupAddress> AssignedGroupAddresses { get; set; } = new();
-        public HashSet<GroupAddress> DependentGroupAddresses { get; set; } = new();
+
+        /// <summary>
+        /// Group addresses declared and used within the dependent device configuration,
+        /// along with the name and datapoint type they were declared with if available.
+        /// </summary>
+        public GroupAddressInfoDictionary DependentGroupAddressInfos { get; set; } = new();
 
         public DateTime DependentGroupAddressesChanged { get; set; }
 

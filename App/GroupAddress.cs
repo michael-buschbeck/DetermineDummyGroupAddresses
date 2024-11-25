@@ -2,6 +2,7 @@
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using System.Xml;
+using System.CodeDom;
 
 namespace DetermineDummyGroupAddresses
 {
@@ -71,6 +72,9 @@ namespace DetermineDummyGroupAddresses
         {
             return $"{Main}/{Middle}/{Sub}";
         }
+
+        public static bool operator==(GroupAddress groupAddressA, GroupAddress groupAddressB) => groupAddressA.Equals(groupAddressB);
+        public static bool operator!=(GroupAddress groupAddressA, GroupAddress groupAddressB) => !groupAddressA.Equals(groupAddressB);
 
         public bool Equals(GroupAddress otherGroupAddress)
         {

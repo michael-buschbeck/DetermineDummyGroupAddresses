@@ -209,7 +209,7 @@ namespace DetermineDummyGroupAddresses
                                     {
                                         GroupAddress = groupAddress,
                                         DatapointType = datapointType,
-                                        Name = groupAddressConfig.Name,
+                                        DatapointName = groupAddressConfig.Name,
                                     };
 
                                     importGroupAddressInfos.Add(groupAddress, groupAddressInfo);

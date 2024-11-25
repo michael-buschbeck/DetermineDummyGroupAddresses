@@ -55,7 +55,7 @@ namespace DetermineDummyGroupAddresses
                 var resultListViewItem = new ListViewItem()
                 {
                     Text = expectedGroupAddress.ToString(),
-                    SubItems = { expectedGroupAddressInfo.Name },
+                    SubItems = { expectedGroupAddressInfo.DatapointName },
 
                     Group = dependentDevice.AssignedGroupAddresses.Contains(expectedGroupAddress)
                         ? ResultListView_ToKeep_ListViewGroup
@@ -80,7 +80,7 @@ namespace DetermineDummyGroupAddresses
 
                 if (project.GroupAddressInfos.TryGetValue(assignedGroupAddress, out var assignedGroupAddressInfo))
                 {
-                    resultListViewItem.SubItems.Add(assignedGroupAddressInfo.Name);
+                    resultListViewItem.SubItems.Add(assignedGroupAddressInfo.DatapointName);
                 }
 
                 ResultListView.Items.Add(resultListViewItem);
