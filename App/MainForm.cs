@@ -187,20 +187,20 @@ namespace DetermineDummyGroupAddresses
                                 {
                                     var groupAddress = new GroupAddress(groupAddressConfig.Address);
                                 
-                                    var datapointType = default(string);
+                                    var datapointType = default(DatapointType);
                                     var datapointTypeIdMatch = datapointTypeIdRegex.Match(groupAddressConfig.DatapointTypeId);
                                 
                                     if (datapointTypeIdMatch.Success)
                                     {
                                         if (datapointTypeIdMatch.Groups["SubNumber"].Success)
                                         {
-                                            datapointType = string.Format("{0}.{1:D3}",
+                                            datapointType = new DatapointType(
                                                 ushort.Parse(datapointTypeIdMatch.Groups["MainNumber"].Value),
                                                 ushort.Parse(datapointTypeIdMatch.Groups["SubNumber"].Value));
                                         }
                                         else
                                         {
-                                            datapointType = string.Format("{0}.*",
+                                            datapointType = new DatapointType(
                                                 ushort.Parse(datapointTypeIdMatch.Groups["MainNumber"].Value));
                                         }
                                     }
@@ -208,8 +208,8 @@ namespace DetermineDummyGroupAddresses
                                     var groupAddressInfo = new GroupAddressInfo() 
                                     {
                                         GroupAddress = groupAddress,
-                                        Name = groupAddressConfig.Name,
                                         DatapointType = datapointType,
+                                        Name = groupAddressConfig.Name,
                                     };
 
                                     importGroupAddressInfos.Add(groupAddress, groupAddressInfo);

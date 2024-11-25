@@ -5,9 +5,9 @@ namespace DetermineDummyGroupAddresses
     public class GroupAddressInfo
     {
         public GroupAddress GroupAddress { get; set; }
+        public DatapointType DatapointType { get; set; }
 
         public string Name { get; set; }
-        public string DatapointType { get; set; }
 
         public HashSet<PhysicalAddress> UsedInSegments { get; set; } = new();
 

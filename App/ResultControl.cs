@@ -35,7 +35,7 @@ namespace DetermineDummyGroupAddresses
 
             var expectedGroupAddressInfos = new Dictionary<GroupAddress, GroupAddressInfo>();
 
-            foreach (GroupAddress dependentGroupAddress in dependentDevice.DependentGroupAddresses)
+            foreach (GroupAddress dependentGroupAddress in dependentDevice.DependentGroupAddressInfos.Keys)
             {
                 if (project.GroupAddressInfos.TryGetValue(dependentGroupAddress, out var dependentGroupAddressInfo) && dependentGroupAddressInfo.IsUsedInSegmentsOtherThan(dependentDevice.SegmentAddress))
                 {
