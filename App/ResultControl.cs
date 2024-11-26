@@ -12,6 +12,7 @@ namespace DetermineDummyGroupAddresses
         private readonly ListViewGroup ResultListView_InconsistentName_ListViewGroup;
 
         private readonly ListViewGroup ResultListView_NotDefined_ListViewGroup;
+        private readonly ListViewGroup ResultListView_Redundant_ListViewGroup;
 
         private readonly ListViewGroup ResultListView_ToAdd_ListViewGroup;
         private readonly ListViewGroup ResultListView_ToRemove_ListViewGroup;
@@ -26,6 +27,7 @@ namespace DetermineDummyGroupAddresses
             ResultListView_InconsistentName_ListViewGroup = ResultListView.Groups["InconsistentName"];
 
             ResultListView_NotDefined_ListViewGroup = ResultListView.Groups["NotDefined"];
+            ResultListView_Redundant_ListViewGroup = ResultListView.Groups["Redundant"];
 
             ResultListView_ToAdd_ListViewGroup = ResultListView.Groups["ToAdd"];
             ResultListView_ToRemove_ListViewGroup = ResultListView.Groups["ToRemove"];
@@ -54,6 +56,8 @@ namespace DetermineDummyGroupAddresses
 
             foreach (var dependentGroupAddress in dependentDevice.DependentGroupAddressInfos.Keys.OrderBy(groupAddress => groupAddress))
             {
+                var firstDependentGroupAddressInfo = dependentDevice.DependentGroupAddressInfos[dependentGroupAddress];
+
                 if (project.GroupAddressInfos.TryGetValue(dependentGroupAddress, out var projectGroupAddressInfo))
                 {
                     if (projectGroupAddressInfo.IsUsedInSegmentsOtherThan(dependentDevice.SegmentAddress))
@@ -63,7 +67,7 @@ namespace DetermineDummyGroupAddresses
                             projectGroupAddressInfo);
                     }
 
-                    foreach (var dependentGroupAddressInfo in dependentDevice.DependentGroupAddressInfos[dependentGroupAddress].All())
+                    foreach (var dependentGroupAddressInfo in firstDependentGroupAddressInfo.All())
                     {
                         if (projectGroupAddressInfo.DatapointName != dependentGroupAddressInfo.DatapointName && dependentGroupAddressInfo.IsPrimary)
                         {
@@ -99,7 +103,7 @@ namespace DetermineDummyGroupAddresses
                 }
                 else
                 {
-                    foreach (var dependentGroupAddressInfo in dependentDevice.DependentGroupAddressInfos[dependentGroupAddress].All())
+                    foreach (var dependentGroupAddressInfo in firstDependentGroupAddressInfo.All())
                     {
                         var resultListViewItem = new ListViewItem()
                         {
@@ -107,6 +111,22 @@ namespace DetermineDummyGroupAddresses
                             SubItems = { dependentGroupAddressInfo.DatapointName },
                             
                             Group = ResultListView_NotDefined_ListViewGroup,
+                        };
+
+                        ResultListView.Items.Add(resultListViewItem);
+                    }
+                }
+
+                foreach (var dependentGroupAddressInfosByName in firstDependentGroupAddressInfo.All().GroupBy(groupAddressInfo => groupAddressInfo.DatapointName))
+                {
+                    if (dependentGroupAddressInfosByName.Count() > 1)
+                    {
+                        var resultListViewItem = new ListViewItem()
+                        {
+                            Text = firstDependentGroupAddressInfo.GroupAddress.ToString(),
+                            SubItems = { dependentGroupAddressInfosByName.Key },
+
+                            Group = ResultListView_Redundant_ListViewGroup,
                         };
 
                         ResultListView.Items.Add(resultListViewItem);
